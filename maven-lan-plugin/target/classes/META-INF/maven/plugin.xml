@@ -1,0 +1,46 @@
+<plugin>
+  <description></description>
+  <groupId>org.twdata.maven.lan</groupId>
+  <artifactId>maven-lan-plugin</artifactId>
+  <version>0.1-SNAPSHOT</version>
+  <goalPrefix>lan</goalPrefix>
+  <isolatedRealm>false</isolatedRealm>
+  <inheritedByDefault>true</inheritedByDefault>
+  <mojos>
+    <mojo>
+      <goal>touch</goal>
+      <description>Goal which touches a timestamp file.</description>
+      <requiresDirectInvocation>false</requiresDirectInvocation>
+      <requiresProject>true</requiresProject>
+      <requiresReports>false</requiresReports>
+      <aggregator>false</aggregator>
+      <requiresOnline>false</requiresOnline>
+      <inheritedByDefault>true</inheritedByDefault>
+      <phase>process-sources</phase>
+      <implementation>org.twdata.maven.lan.MyMojo</implementation>
+      <language>java</language>
+      <instantiationStrategy>per-lookup</instantiationStrategy>
+      <executionStrategy>once-per-session</executionStrategy>
+      <parameters>
+        <parameter>
+          <name>outputDirectory</name>
+          <type>java.io.File</type>
+          <required>true</required>
+          <editable>true</editable>
+          <description>Location of the file.</description>
+        </parameter>
+      </parameters>
+      <configuration>
+        <outputDirectory implementation="java.io.File">${project.build.directory}</outputDirectory>
+      </configuration>
+    </mojo>
+  </mojos>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <type>jar</type>
+      <version>2.0</version>
+    </dependency>
+  </dependencies>
+</plugin>
