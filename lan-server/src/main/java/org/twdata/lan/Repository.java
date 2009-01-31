@@ -1,6 +1,5 @@
 package org.twdata.lan;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Map;
 
@@ -13,29 +12,40 @@ import java.util.Map;
  */
 @XmlRootElement
 public class Repository {
-    private String url;
+    private String name;
+    private String path;
     private Map<String,String> properties;
 
-    private Repository() {}
+    private Repository() {
+    }
     
-    public Repository(String url, Map<String, String> properties) {
-        this.url = url;
+    public Repository(String name, String path, Map<String, String> properties) {
+        this.name = name;
+        this.path = path;
         this.properties = properties;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
     }
 
-    public String getUrl() {
-        return url;
+    public String getPath() {
+        return path;
     }
 
     public Map<String, String> getProperties() {
         return properties;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -1,4 +1,4 @@
-package org.twdata.lan;
+package org.twdata.lan.server;
 
 import org.mortbay.jetty.handler.*;
 import org.mortbay.jetty.Handler;
@@ -6,10 +6,14 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.HandlerContainer;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.servlet.Context;
+import org.twdata.lan.rest.GuiceServlet;
+import org.twdata.lan.LanArguments;
 
 import java.io.File;
 
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+import com.google.inject.Injector;
+import com.google.inject.Inject;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,9 +25,12 @@ import com.sun.jersey.spi.container.servlet.ServletContainer;
 public class WebServer {
 
     private final Server server;
+    private final Injector injector;
 
-    public WebServer(int port) {
-        server = new Server(port);
+    @Inject
+    public WebServer(Injector injector, LanArguments config) {
+        server = new Server(config.getPort());
+        this.injector = injector;
 
         ContextHandlerCollection contexts = new ContextHandlerCollection();
 
@@ -52,7 +59,7 @@ public class WebServer {
     }
 
     private void configureJersey(HandlerContainer container) {
-        ServletHolder sh = new ServletHolder(ServletContainer.class);
+        ServletHolder sh = new ServletHolder(GuiceServlet.class);
 
         /*
         * For 0.8 and later the "com.sun.ws.rest" namespace has been renamed to
@@ -62,8 +69,11 @@ public class WebServer {
         // sh.setInitParameter("com.sun.ws.rest.config.property.packages", "jetty");
         //sh.setInitParameter("com.sun.jersey.config.property.resourceConfigClass", "com.sun.jersey.api.core.PackagesResourceConfig");
         sh.setInitParameter("com.sun.jersey.config.property.packages", "org.twdata.lan.rest");
+        sh.setInitParameter("injectorContextAttribute", "_injector");
+
 
         Context context = new Context(container, "/", Context.SESSIONS);
+        context.setAttribute("_injector", injector);
         context.addServlet(sh, "/*");
 
     }

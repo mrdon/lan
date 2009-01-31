@@ -14,9 +14,9 @@ import java.util.*;
 public class RepositoryManager {
 
     private static final Map<String,Repository> data = new HashMap<String,Repository>() {{
-        put("one", new Repository("http://localhost/one", null));
-        put("two", new Repository("http://localhost/one", null));
-        put("three", new Repository("http://localhost/one", Collections.singletonMap("foo", "bar")));
+        put("one", new Repository("one", "http://localhost/one", null));
+        put("two", new Repository("two", "http://localhost/one", null));
+        put("three", new Repository("three", "http://localhost/one", Collections.singletonMap("foo", "bar")));
     }};
 
     public List<Repository> getAll() {

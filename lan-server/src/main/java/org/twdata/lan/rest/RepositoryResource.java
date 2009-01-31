@@ -1,15 +1,11 @@
 package org.twdata.lan.rest;
 
 import org.twdata.lan.Repository;
+import org.twdata.lan.RepositoryService;
 import org.twdata.lan.manager.RepositoryManager;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.util.Map;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -22,18 +18,24 @@ import java.util.List;
 @Path("/repository")
 public class RepositoryResource {
 
-    private final RepositoryManager mgr = new RepositoryManager();
+    private final RepositoryService repositoryService;
+
+    public RepositoryResource(RepositoryService repositoryService) {
+        this.repositoryService = repositoryService;
+    }
+
     @GET
     @Produces("application/xml")
     public List<Repository> get() {
-        return mgr.getAll();
+        return repositoryService.getAll();
     }
 
     @Path("{id}")
-    @GET
-    public Response getPluginResource(@PathParam("id") String id)
+    @PUT
+    public Response addPluginResource(@PathParam("id") String id, Repository repo)
     {
-        return Response.ok(mgr.get(id)).build();
+        repositoryService.add(id, repo);
+        return Response.ok("Repository added successfully").build();
     }
 
 }

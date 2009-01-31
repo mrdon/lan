@@ -29,12 +29,30 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.15</version>
+        </dependency>
+        <dependency>
+            <groupId>jerseyguice</groupId>
+            <artifactId>jerseyguice</artifactId>
+            <version>0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.guice</groupId>
+            <artifactId>guice</artifactId>
+            <version>1.0</version>
+        </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
             <version>1.0.1</version>
         </dependency>
-
+        <dependency>
+            <groupId>jmdns</groupId>
+            <artifactId>jmdns</artifactId>
+            <version>2.1</version>
+        </dependency>
     </dependencies>
 </project>
