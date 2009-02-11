@@ -208,7 +208,6 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
 			this.clazz = clazz;
 		}
 
-		@Override
 		public Object getInjectableInstance(Object o)
 		{
 			return o;
@@ -219,7 +218,6 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
 			return c.getSuperclass();
 		}
 
-		@Override
 		public Object getInstance()
 		{
 			return injector.getInstance(clazz);

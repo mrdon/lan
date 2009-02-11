@@ -24,16 +24,50 @@
             <version>0.57</version>
         </dependency>
         <dependency>
+            <groupId>uk.co.flamingpenguin.jewelcli</groupId>
+            <artifactId>jewelcli</artifactId>
+            <version>0.57</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.4</version>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.15</version>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+          <version>1.2.15</version>
+          <exclusions>
+            <exclusion>
+              <groupId>com.sun.jdmk</groupId>
+              <artifactId>jmxtools</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>com.sun.jmx</groupId>
+              <artifactId>jmxri</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>javax.jms</groupId>
+              <artifactId>jms</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>javax.mail</groupId>
+              <artifactId>mail</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>javax.activation</groupId>
+              <artifactId>activation</artifactId>
+            </exclusion>
+          </exclusions>
         </dependency>
+
         <dependency>
             <groupId>jerseyguice</groupId>
             <artifactId>jerseyguice</artifactId>

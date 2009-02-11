@@ -26,7 +26,6 @@ public class App
 
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable()
         {
-            @Override
             public void run() {
                 try {
                     injector.getInstance(WebServer.class).stop();
