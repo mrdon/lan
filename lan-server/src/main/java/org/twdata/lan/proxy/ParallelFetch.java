@@ -5,28 +5,37 @@ import org.apache.commons.io.IOUtils;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 import java.util.concurrent.*;
 
 public class ParallelFetch
 {
     private final List<String> repos;
     private final ThreadPoolExecutor fetchPool;
+    private final List<ArtifactRetriever> retrievers;
 
-    public ParallelFetch(List<String> repos)
+    public ParallelFetch(List<String> baseRepositories)
     {
-        this.repos = repos;
-        fetchPool = new ThreadPoolExecutor(10, 20, 5, TimeUnit.MINUTES, new LinkedBlockingQueue());
+        this.repos = new CopyOnWriteArrayList<String>(baseRepositories);
+        fetchPool = new ThreadPoolExecutor(10, 20, 5, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
+        retrievers = new CopyOnWriteArrayList<ArtifactRetriever>(Arrays.asList(
+                new URLArtifactRetriever(), new HttpArtifactRetriever()
+        ));
     }
 
-    public File retrieve(String path)
+    public void addRepositoryUrl(String url)
     {
-        List<FetchTask> tasks = new ArrayList<FetchTask>();
-        for (String repo : repos)
-        {
-            FetchTask task = new FetchTask(new URLArtifactRetriever(repo), path);
-            tasks.add(task);
+        repos.add(url);
+    }
 
-        }
+    public void removeRepositoryUrl(String url)
+    {
+        repos.remove(url);
+    }
+
+    public File fetch(String path)
+    {
+        List<FetchTask> tasks = buildTaskList(path);
 
         CompletionService<InputStream> ecs = new ExecutorCompletionService<InputStream>(fetchPool);
         int n = tasks.size();
@@ -45,7 +54,7 @@ public class ParallelFetch
                 } catch(ExecutionException ignore) {}
                 catch (InterruptedException e)
                 {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    // ignore
                 }
             }
         }
@@ -66,7 +75,7 @@ public class ParallelFetch
                 }
                 catch (IOException e)
                 {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    throw new RuntimeException("Cannot copy partifact", e);
                 }
             finally
             {
@@ -75,6 +84,32 @@ public class ParallelFetch
             }
         }
         return null;
+    }
+
+    private List<FetchTask> buildTaskList(String path)
+    {
+        List<FetchTask> tasks = new ArrayList<FetchTask>();
+        for (String repo : repos)
+        {
+            String url = repo + path;
+            ArtifactRetriever retriever = null;
+            for (ArtifactRetriever ret : retrievers)
+            {
+                if (ret.canRetrieve(url))
+                {
+                    retriever = ret;
+                    break;
+                }
+            }
+            if (retriever == null)
+            {
+                throw new IllegalArgumentException("Cannot find retriever for URL "+url);
+            }
+
+            FetchTask task = new FetchTask(retriever, url);
+            tasks.add(task);
+        }
+        return tasks;
     }
 
     private static class FetchTask implements Callable<InputStream>
@@ -91,19 +126,17 @@ public class ParallelFetch
         public InputStream call()
         {
             Thread thread = Thread.currentThread();
-            try
+            Object session = ret.tryToRetrieve(path);
+            if (session != null)
             {
-                if (ret.canRetrieve(path))
+                if (!thread.isInterrupted())
                 {
-                    if (!thread.isInterrupted())
-                    {
-                        return ret.retrieve();
-                    }
+                    return ret.retrieve(session);
                 }
-            }
-            finally
-            {
-                ret.abort();
+                else
+                {
+                    ret.abort(session);
+                }
             }
             return null;
         }

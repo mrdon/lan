@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 
-public interface ArtifactRetriever
+public interface ArtifactRetriever<T>
 {
-    boolean canRetrieve(String path);
-    InputStream retrieve();
-    void abort();
+    T tryToRetrieve(String path);
+    InputStream retrieve(T session);
+    void abort(T session);
+
+    boolean canRetrieve(String urlPath);
 }

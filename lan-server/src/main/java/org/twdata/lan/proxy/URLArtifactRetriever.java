@@ -1,33 +1,31 @@
 package org.twdata.lan.proxy;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.net.URL;
 import java.net.MalformedURLException;
 import java.net.URLConnection;
 
-public class URLArtifactRetriever implements ArtifactRetriever
+public class URLArtifactRetriever implements ArtifactRetriever<URLConnection>
 {
-    private final String baseUrl;
+    private static final Logger log = Logger.getLogger(URLArtifactRetriever.class);
 
-    private URLConnection conn;
-
-    public URLArtifactRetriever(String baseUrl)
+    public boolean canRetrieve(String urlPath)
     {
-        this.baseUrl = baseUrl;
+        return true;
     }
 
-    public boolean canRetrieve(String path)
+    public URLConnection tryToRetrieve(String urlPath)
     {
         URL url = null;
-        final String urlPath = baseUrl + path;
         try
         {
             url = new URL(urlPath);
-            conn = url.openConnection();
+            URLConnection conn = url.openConnection();
             conn.connect();
-            return true;
+            return conn;
         }
         catch (MalformedURLException e)
         {
@@ -37,14 +35,17 @@ public class URLArtifactRetriever implements ArtifactRetriever
         {
             //e.printStackTrace();
         }
-        return false;
+        return null;
     }
 
-    public InputStream retrieve()
+    public InputStream retrieve(URLConnection conn)
     {
         try
         {
-            System.out.println("Retrieved from "+baseUrl);
+            if (log.isDebugEnabled())
+            {
+                log.debug("Retrieved from "+conn.getURL());
+            }
             return conn.getInputStream();
         }
         catch (MalformedURLException e)
@@ -57,7 +58,7 @@ public class URLArtifactRetriever implements ArtifactRetriever
         }
     }
 
-    public void abort()
+    public void abort(URLConnection conn)
     {
         if (conn != null)
         {
@@ -67,7 +68,7 @@ public class URLArtifactRetriever implements ArtifactRetriever
             }
             catch (IOException e)
             {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                // ignore as we can't get the input stream from the connection
             }
         }
     }
